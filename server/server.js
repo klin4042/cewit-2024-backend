@@ -14,6 +14,31 @@ const generate_questions = require("./ai_stuff/generate_qs.js")
 
 app.listen(port, () => { console.log(`App listening on port ${port}`) });
 
+let mongoose = require('mongoose');
+const dataURL = process.env.ATLAS_URL;
+
+const Questions = require('./models/questions');
+
+mongoose.connect(dataURL, {useNewUrlParser: true, useUnifiedTopology:true})
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((error) => {
+        console.error('Error connecting to MongoDB' + error);
+    });
+
+process.on('SIGINT', async () => {
+    try{
+      await mongoose.connection.close(); 
+      console.log('Server closed. Database instance disconnected');
+      process.exit(0);
+    }   
+    catch(error){
+      console.error('Error closing the database connection:', error);
+      process.exit(1);
+    }   
+    
+})
 
 app.get('/suer', (req, res) => {
     res.send("HI");
