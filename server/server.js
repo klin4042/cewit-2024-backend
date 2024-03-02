@@ -9,6 +9,8 @@ const detectStarMethod = require("./ai_stuff/optimal.js")
 const detectAnswerRelevance = require("./ai_stuff/relevance.js")
 const detectAnswerProfessionalism = require("./ai_stuff/professionalism.js")
 const {finalFeedbackMethod, findScores} = require("./ai_stuff/final_feedback.js")
+const generate_questions = require("./ai_stuff/generate_qs.js")
+
 
 app.listen(port, () => { console.log(`App listening on port ${port}`) });
 
@@ -55,4 +57,30 @@ try {
     res.status(500).json({ error: 'Internal Server Error' });
 }
 });
-  
+
+app.get('/questions/generate', async (req, res) => {
+    try {
+        const job_title = req.query.title;
+        questions = await generate_questions(job_title)
+                    .then(questions => {
+                    return questions;
+                    })
+                    .catch(error => {
+                    console.error('Error:', error.message);
+                    });
+      
+        const jsonResponse = JSON.stringify({
+            "Questions": questions
+        }, null, 2);
+        
+        for (const element of questions) {
+            console.log(element);
+        }
+
+        res.send(`<pre>${jsonResponse}</pre>`);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+    });
