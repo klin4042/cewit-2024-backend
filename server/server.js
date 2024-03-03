@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 8000;
 const axios = require('axios');
+const cors = require('cors');
 require('dotenv').config();
 // const apiKey = process.env.GPT_API_KEY;
 // const apiUrl = 'https://api.openai.com/v1/completions';
@@ -11,6 +12,11 @@ const detectAnswerProfessionalism = require("./ai_stuff/professionalism.js")
 const {finalFeedbackMethod, findScores} = require("./ai_stuff/final_feedback.js")
 const generate_questions = require("./ai_stuff/generate_qs.js")
 
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['POST', 'PUT', 'GET', 'DELETE', 'PATCH'],
+    credentials: true,
+  }))
 
 app.listen(port, () => { console.log(`App listening on port ${port}`) });
 
@@ -84,7 +90,7 @@ try {
 }
 });
 
-app.get('/questions/generate', async (req, res) => {
+app.post('/questions/generate', async (req, res) => {
     try {
         const job_title = req.query.title;
         let questions = [] 

@@ -1,12 +1,21 @@
 const axios = require('axios');
 require('dotenv').config();
-
+const cors = require('cors');
 const OpenAI = require("openai") ;
 const questions = require('../models/questions');
+const express = require('express')
 
 const openai = new OpenAI({ apiKey: process.env.GPT_API_KEY});
 
 const number_of_questions = 10;
+
+const app = express()
+
+app.use(cors({
+    origin: 'http://localhost:5173/',
+    methods: ['POST', 'PUT', 'GET', 'DELETE', 'PATCH'],
+    credentials: true,
+  }))
 
 function createArrayFromString(inputString) {
     try {
