@@ -21,7 +21,7 @@ app.use(cors({
 app.listen(port, () => { console.log(`App listening on port ${port}`) });
 
 let mongoose = require('mongoose');
-const dataURL = process.env.ATLAS_URL;
+const dataURL = process.env.ATLAS_URI;
 
 const Questions = require('./models/questions');
 const questions = require('./models/questions');
@@ -152,6 +152,40 @@ app.get('/questions/retrieve', async (req, res) => {
         console.error("Internal Error");
     }
 });
+
+
+app.get('/add-answer', async (req, res) => {
+    const { qID, answer } = req.query;
+
+  // Check if qID and answer are provided
+  if (!qID || !answer) {
+    return res.status(400).json({ message: 'Both qID and answer parameters are required' });
+  }
+
+  try {
+    // Update the question document with the provided answer
+    const updatedQuestion = await Questions.findByIdAndUpdate(
+      qID,
+      { "answer": answer }
+    );
+
+    // Check if the question was found and updated
+    if (!updatedQuestion) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    // Respond with the updated question
+    return res.status(200).json(updatedQuestion);
+  } catch (error) {
+    console.error('Error updating question:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+
+
+
+  
+  
+})
 
 /*
 Populate DB from generate

@@ -48,7 +48,6 @@ async function generate_questions(job_title) {
         model: "gpt-3.5-turbo",
         temperature: 1.6
     });
-
     let questions = completion.choices[0].message.content;
     console.log(questions)
     questions = createArrayFromString(questions);
