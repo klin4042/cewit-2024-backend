@@ -24,7 +24,8 @@ let mongoose = require('mongoose');
 const dataURL = process.env.ATLAS_URI;
 
 const Questions = require('./models/questions');
-const questions = require('./models/questions');
+// const questions = require('./models/questions');
+const Feedback = require('./models/feedback');
 
 mongoose.connect(dataURL, {useNewUrlParser: true, useUnifiedTopology:true})
     .then(() => {
@@ -59,6 +60,9 @@ app.get('/star/generate', async (req, res) => {
 try {
     const interviewQuestion = req.query.question;
     const userAnswer = req.query.answer;
+
+    console.log(interviewQuestion)
+    console.log(userAnswer);
     
     if (!interviewQuestion || !userAnswer) {
     return res.status(400).json({ error: 'Question and answer parameter is required.' });
@@ -71,22 +75,25 @@ try {
     const scores = await findScores(feedback)
     const final_feedback = await finalFeedbackMethod(interviewQuestion, userAnswer, feedback);
 
-    const jsonResponse = JSON.stringify({
+    const jsonResponse = new Feedback({
         "Question": interviewQuestion,
         "Answer": userAnswer,
         "STAR": star,
         "Relevance": relevance,
         "Professionalism": professionalism,
-        "Total Feedback": feedback,
+        "Total_Feedback": feedback,
         "Scores": scores,
         "Result": final_feedback
-      }, null, 2);
+      });  
 
-    res.send(`<pre>${jsonResponse}</pre>`);
+    await jsonResponse.save();
+
+    // res.send(`<pre>${jsonResponse}</pre>`);
+    return res.status(200).json(jsonResponse);
     
 } catch (error) {
     console.error('Error:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
 }
 });
 
