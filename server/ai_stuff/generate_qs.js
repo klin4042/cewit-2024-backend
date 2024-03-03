@@ -33,9 +33,10 @@ async function generate_questions(job_title) {
         },
         {
             "role": "user",
-            "content": "I am looking for a " + job_title + " position. Can you provide” + number_of_questions “behavioral response questions? Organize these questions into an array using this syntax [...,...,...] without new lines"
+            "content": "I am looking for a " + job_title + " position. Can you provide" + number_of_questions + "behavioral response questions? Organize these questions into an array using this syntax [...,...,...] without new lines"
         }],
-        model: "gpt-3.5-turbo"
+        model: "gpt-3.5-turbo",
+        temperature: 1.6
     });
 
     questions = completion.choices[0].message.content;

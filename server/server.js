@@ -18,6 +18,7 @@ let mongoose = require('mongoose');
 const dataURL = process.env.ATLAS_URL;
 
 const Questions = require('./models/questions');
+const questions = require('./models/questions');
 
 mongoose.connect(dataURL, {useNewUrlParser: true, useUnifiedTopology:true})
     .then(() => {
@@ -83,9 +84,10 @@ try {
 }
 });
 
-app.get('/questions/generate', async (req, res) => {
+app.post('/questions/generate', async (req, res) => {
     try {
         const job_title = req.query.title;
+        let questions = [] 
         questions = await generate_questions(job_title)
                     .then(questions => {
                     return questions;
@@ -93,7 +95,16 @@ app.get('/questions/generate', async (req, res) => {
                     .catch(error => {
                     console.error('Error:', error.message);
                     });
+        
       
+        if(questions !== null && questions !== undefined && Array.isArray(questions)){
+            for(let i = 0; i < questions.length; i++){
+                await Questions.create({
+                    text: questions[i],
+                });
+            }
+        }
+
         const jsonResponse = JSON.stringify({
             "Questions": questions
         }, null, 2);
@@ -109,3 +120,34 @@ app.get('/questions/generate', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
     });
+
+app.post('/questions/clear', async (req, res) => {
+    try{
+        await Questions.deleteMany({});
+        res.send("Success");
+    } catch (error) {
+        res.error(error);
+    }
+})
+
+app.get('/questions/retrieve', async (req, res) => {
+    try{
+        const questions = [];
+        const quantity = req.query.quantity;
+        for(let i = 0; i < quantity; i++){
+            const question = await Questions.findOneAndDelete();
+            if(question === undefined || question === null)
+                break;
+            questions.push(question);
+        }
+        res.send(questions);
+    }
+    catch(error){
+        console.error("Internal Error");
+    }
+});
+
+/*
+Populate DB from generate
+Pop from DB from retrieve
+*/
