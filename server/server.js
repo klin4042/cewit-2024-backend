@@ -84,7 +84,7 @@ try {
 }
 });
 
-app.post('/questions/generate', async (req, res) => {
+app.get('/questions/generate', async (req, res) => {
     try {
         const job_title = req.query.title;
         let questions = [] 

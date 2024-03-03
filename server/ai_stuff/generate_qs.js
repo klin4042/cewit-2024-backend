@@ -2,6 +2,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const OpenAI = require("openai") ;
+const questions = require('../models/questions');
 
 const openai = new OpenAI({ apiKey: process.env.GPT_API_KEY});
 
@@ -39,8 +40,10 @@ async function generate_questions(job_title) {
         temperature: 1.6
     });
 
-    questions = completion.choices[0].message.content;
+    let questions = completion.choices[0].message.content;
+    console.log(questions)
     questions = createArrayFromString(questions);
+    console.log(questions)
     return questions;
     // console.log(completion.choices[0].message.content);
 }
